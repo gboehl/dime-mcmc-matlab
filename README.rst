@@ -22,6 +22,30 @@ There exist complementary implementations in `Python <https://github.com/gboehl/
 Usage
 -----
 
+The core functionality is included in the function ``dime_mcmc``:
+
+.. code-block:: matlab
+
+    % some imports
+    pkg load statistics
+
+    % define your density function
+    log_prob = ...
+
+    % define the initial ensemble
+    initchain = ...
+
+    % define the number of iterations
+    niter = ...
+
+    % off you go sampling
+    [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, initchain, niter)
+    ...
+
+
+Tutorial
+--------
+
 Be sure the files from above are in your matlab path. Then, lets define a challenging example distribution **with three separate modes**:
 
 .. code-block:: matlab
