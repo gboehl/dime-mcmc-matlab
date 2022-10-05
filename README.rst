@@ -15,9 +15,17 @@ The sampler has a series of advantages over conventional samplers:
 Installation
 ------------
 
-Copy the file ``dime_mcmc.m`` from the `"matlab" folder <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ in this repo somwhere and add them to you matlab path. If you want to run the tutorial, you also need the files ``create_dime_test_func.m`` and ``dime_test_func_marginal_pdf.m``. You can get a zip file containing the complete repo `here <https://github.com/gboehl/dime-mcmc-matlab/archive/refs/heads/main.zip>`_.
+Copy the `matlab <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ from this repo somwhere and add it to you matlab path:
 
-There exist complementary implementations in `Python <https://github.com/gboehl/emcwrap>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_.
+.. code-block:: matlab
+
+    addpath('where/ever/to/dime_mcmc_matlab/matlab')
+
+You can get a zip file containing the complete repo `here <https://github.com/gboehl/dime-mcmc-matlab/archive/refs/heads/main.zip>`_.
+
+Note that you need the statistics toolbox for matlab. In Octave `pkg load Statistics` does the job.
+
+There exist complementary implementations of DIME MCMC in `Python <https://github.com/gboehl/emcwrap>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_ (where you don't need expensive toolboxes).
 
 Usage
 -----
@@ -46,9 +54,6 @@ Tutorial
 Be sure the files from above are in your matlab path. Then, lets define a challenging example distribution **with three separate modes**:
 
 .. code-block:: matlab
-
-    % some imports
-    pkg load statistics
 
     % make it reproducible
     rng('default'); rng(1);
