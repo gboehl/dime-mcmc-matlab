@@ -102,7 +102,7 @@ To ensure proper mixing, let us also have a look at the MCMC traces, again focus
     lines = plot(chains(:,:,1), color='blue');
     lines(4) = 0.05
 
-.. image:: https://github.com/gboehl/DIMESampler.jl/blob/main/docs/traces.png?raw=true
+.. image:: https://github.com/gboehl/emcwrap/blob/main/docs/traces.png?raw=true
   :width: 800
   :alt: MCMC traces
   
@@ -115,7 +115,7 @@ While DIME is a MCMC sampler, it can straightforwardly be used as a global optim
     lines = plot(lprobs, color='blue');
     lines(4) = 0.05
 
-.. image:: https://github.com/gboehl/DIMESampler.jl/blob/main/docs/lprobs.png?raw=true
+.. image:: https://github.com/gboehl/emcwrap/blob/main/docs/lprobs.png?raw=true
   :width: 800
   :alt: Log-likelihoods
 
