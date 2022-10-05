@@ -15,7 +15,7 @@ The sampler has a series of advantages over conventional samplers:
 Installation
 ------------
 
-Copy the file ``dime_mcmc.m`` from the ``matlab`` folder in this repo somwhere and add them to you matlab path. If you want to run the tutorial, you also need the files ``create_dime_test_func.m`` and ``dime_test_func_marginal_pdf.m``. You can get a zip file containing the complete repo `here <https://github.com/gboehl/dime-mcmc-matlab/archive/refs/heads/main.zip>`_.
+Copy the file ``dime_mcmc.m`` from the `"matlab" folder <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ in this repo somwhere and add them to you matlab path. If you want to run the tutorial, you also need the files ``create_dime_test_func.m`` and ``dime_test_func_marginal_pdf.m``. You can get a zip file containing the complete repo `here <https://github.com/gboehl/dime-mcmc-matlab/archive/refs/heads/main.zip>`_.
 
 There exist complementary implementations in `Python <https://github.com/gboehl/emcwrap>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_.
 
