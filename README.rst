@@ -15,7 +15,7 @@ The sampler has a series of advantages over conventional samplers:
 Installation
 ------------
 
-Copy the `matlab <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ from this repo somwhere and add it to you matlab path:
+Copy the `matlab <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ folder from this repo somwhere on your PC and add it to you matlab path:
 
 .. code-block:: matlab
 
