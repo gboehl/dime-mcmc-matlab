@@ -4,7 +4,7 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 
     [nchain, ndim] = size(init);
 
-    # get some default values
+    % get some default values
     dft = df_proposal_dist;
 
     if isnan(gammah)
@@ -13,17 +13,17 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
         g0 = gammah;
     end
 
-    # initialize
+    % initialize
     prop_cov = eye(ndim);
     prop_mean = zeros(ndim,1);
     accepted = ones(nchain,1);
     cumlweight = -inf;
 
-    # calculate intial values
+    % calculate intial values
     x = init;
     lprob = log_prob(x');
 
-    # preallocate
+    % preallocate
     chains = zeros(niter, nchain, ndim);
     lprobs = zeros(niter, nchain);
 
@@ -33,54 +33,54 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 
     for i = 1:niter
 
-        # get differential evolution proposal
-        # draw the indices of the complementary chains
+        % get differential evolution proposal
+        % draw the indices of the complementary chains
         i1 = (0:nchain-1) + randsample(nchain-1,nchain, true);
         i2 = (0:nchain-1) + randsample(nchain-2,nchain, true);
         i2(i2 > i1) += 1;
 
-        # add small noise and calculate proposal
+        % add small noise and calculate proposal
         f = sigma*normrnd(0,1, nchain, 1);
         q = x + g0 * (x(mod(i1, nchain) + 1,:) - x(mod(i2, nchain) + 1,:)) + f;
         factors = zeros(nchain,1);
 
-        # log weight of current ensemble
-        # TODO: this should use logsumexp to avoid numerical errors
+        % log weight of current ensemble
+        % TODO: this should use logsumexp to avoid numerical errors
         lweight = log(sum(exp(lprob))) + log(sum(accepted)) - log(nchain);
 
-        # calculate stats for current ensemble
+        % calculate stats for current ensemble
         ncov = cov(x);
         nmean = mean(x);
 
-        # update AIMH proposal distribution
+        % update AIMH proposal distribution
         newcumlweight = log(exp(cumlweight) + exp(lweight));
         prop_cov = exp(cumlweight - newcumlweight) * prop_cov + exp(lweight - newcumlweight) * ncov;
         prop_mean = exp(cumlweight - newcumlweight) * prop_mean + exp(lweight - newcumlweight) * nmean;
         cumlweight = newcumlweight;
 
-        # get AIMH proposal
+        % get AIMH proposal
         xchnge = unifrnd(0,1,nchain,1) <= aimh_prob;
 
-        # draw alternative candidates and calculate their proposal density
+        % draw alternative candidates and calculate their proposal density
         xcand = mvtrnd(prop_cov*(dft - 2)/dft, dft, sum(xchnge));
         lprop_old = log(mvtpdf(x(xchnge,:), prop_cov*(dft - 2)/dft, dft));
         lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft, dft));
 
-        # update proposals and factors
+        % update proposals and factors
         q(xchnge,:) = xcand;
         factors(xchnge) = lprop_old - lprop_new;
 
-        # Metropolis-Hasings 
+        % Metropolis-Hasings 
         newlprob = log_prob(q');
         lnpdiff = factors + newlprob - lprob;
         accepted = lnpdiff > log(unifrnd(0,1,nchain,1));
         naccepted = sum(accepted);
 
-        # update chains
+        % update chains
         x(accepted,:) = q(accepted,:);
         lprob(accepted) = newlprob(accepted);
 
-        # store
+        % store
         chains(i,:,:) = x;
         lprobs(i,:) = lprob;
 

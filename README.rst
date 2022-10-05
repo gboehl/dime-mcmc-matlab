@@ -26,13 +26,13 @@ Be sure the files from above are in your matlab path. Then, lets define a challe
 
 .. code-block:: matlab
 
-    # some imports
+    % some imports
     pkg load statistics
 
-    # make it reproducible
+    % make it reproducible
     rng('default'); rng(1);
 
-    # define distribution
+    % define distribution
     m = 2;
     cov_scale = 0.05;
     weight = [0.33 0.1];
@@ -50,7 +50,7 @@ Next, define the initial ensemble. In a Bayesian setup, a good initial ensemble 
 .. code-block:: matlab
 
     initvar = 2;
-    nchain = ndim*5; # a sane default
+    nchain = ndim*5; % a sane default
     initcov = eye(ndim)*initvar;
     initmean = zeros(ndim, 1);
     initchain = mvnrnd(initmean, initcov, nchain);
@@ -70,17 +70,17 @@ Let's plot the marginal distribution along the first dimension (remember that th
 
 .. code-block:: matlab
 
-    # get sample and analytical marginal pdf
+    % get sample and analytical marginal pdf
     x = linspace(-4,4,1000);
     mpdf = dime_test_func_marginal_pdf(x, cov_scale, m, weight);
     sample = reshape(chains(end-fix(niter/3):end,:,1), [], 1);
 
-    # calculate a histogram with densities
+    % calculate a histogram with densities
     bins = linspace(-4,4,100);
     counts = histc(sample, bins);
     density = counts / (sum(counts) * diff(bins)(1));
 
-    # plot
+    % plot
     hold on
     bar(bins+diff(bins)(1)/2, density)
     plot(x, mpdf)
