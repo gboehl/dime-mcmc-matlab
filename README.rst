@@ -26,9 +26,6 @@ The core functionality is included in the function ``dime_mcmc``:
 
 .. code-block:: matlab
 
-    % some imports
-    pkg load statistics
-
     % define your density function
     log_prob = ...
 
