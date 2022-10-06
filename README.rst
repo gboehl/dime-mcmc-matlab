@@ -104,7 +104,8 @@ Let's plot the marginal distribution along the first dimension (remember that th
     % calculate a histogram with densities
     bins = linspace(-3,3,50);
     counts = histc(sample, bins);
-    density = counts / (sum(counts) * (bins(2) - bins(1)));
+    density = counts / (sum(counts) * (bins(2)-bins(1)));
+    scale = sqrt(prop_cov(1,1)*10/8);
 
     % plot
     figure;
