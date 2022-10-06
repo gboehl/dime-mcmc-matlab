@@ -1,5 +1,5 @@
-function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, sigma=1e-5, gammah=nan, aimh_prob=0.1, df_proposal_dist=10, progress=true)
-% function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, sigma=1e-5, gammah=nan, aimh_prob=0.1, df_proposal_dist=10, progress=true) 
+function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist)
+% function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist)
 % DIME MCMC sampling
 %
 % INPUTS
@@ -20,12 +20,28 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 [nchain, ndim] = size(init);
 
 % get some default values
-dft = df_proposal_dist;
-
-if isnan(gammah)
-    g0 = 2.38 / sqrt(2 * ndim);
+if nargin > 3
+    aimh_prob = optaimh_prob;
 else
-    g0 = gammah;
+    aimh_prob = 0.1;
+end
+
+if nargin > 4
+    sigma = optsigma;
+else
+    sigma = 1e-5;
+end
+
+if nargin > 5
+    g0 = optgamma;
+else
+    g0 = 2.38 / sqrt(2 * ndim);
+end
+
+if nargin > 6
+    dft = optdf_proposal_dist;
+else
+    dft = 10;
 end
 
 % initialize
@@ -42,17 +58,15 @@ lprob = log_prob(x');
 chains = zeros(niter, nchain, ndim);
 lprobs = zeros(niter, nchain);
 
-if progress
-    pbar = waitbar(0, '');
-end
+pbar = waitbar(0, '');
 
 for i = 1:niter
 
     % get differential evolution proposal
     % draw the indices of the complementary chains
-    i1 = (0:nchain-1) + randsample(nchain-1,nchain, true);
-    i2 = (0:nchain-1) + randsample(nchain-2,nchain, true);
-    i2(i2 > i1) += 1;
+    i1 = (0:nchain-1) + randsample(nchain-1,nchain, true)';
+    i2 = (0:nchain-1) + randsample(nchain-2,nchain, true)';
+    i2(i2 > i1) = i2(i2 > i1) + 1;
 
     % add small noise and calculate proposal
     f = sigma*normrnd(0,1, nchain, 1);
@@ -98,10 +112,6 @@ for i = 1:niter
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
 
-    if progress
-        waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%.0d%%]", max(lprob), std(lprob), 100*naccepted/nchain));
-    end
+    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%.0d%%]", max(lprob), std(lprob), 100*naccepted/nchain));
 end
-if progress
-    close(pbar)
-end
+close(pbar)
