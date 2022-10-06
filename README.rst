@@ -99,22 +99,23 @@ Let's plot the marginal distribution along the first dimension (remember that th
     % get sample and analytical marginal pdf
     x = linspace(-4,4,1000);
     mpdf = dime_test_func_marginal_pdf(x, cov_scale, m, weight);
-    sample = reshape(chains(end-fix(niter/2):end,:,1), [], 1);
+    sample = reshape(chains(end-fix(niter/3):end,:,1), [], 1);
 
     % calculate a histogram with densities
-    bins = linspace(-4,4,100);
+    bins = linspace(-3,3,50);
     counts = histc(sample, bins);
-    density = counts / (sum(counts) * diff(bins)(1));
+    density = counts / (sum(counts) * (bins(2) - bins(1)));
 
     % plot
     hold on
-    bar(bins+diff(bins)(1)/2, density)
+    bar(bins+(bins(2) - bins(1))/2, density)
     plot(x, mpdf)
     plot(x, normpdf(x, 0, sqrt(initvar)))
     plot(x, tpdf((x - prop_mean(1))/sqrt(prop_cov(1,1)*10/8), 10))
     xlim([-4 4])
     legend({'Sample', 'Target','Initialization','Final Proposal'},'Location','northwest')
     hold off
+
 
 .. image:: https://github.com/gboehl/emcwrap/blob/main/docs/dist.png?raw=true
   :width: 800
@@ -125,9 +126,11 @@ To ensure proper mixing, let us also have a look at the MCMC traces, again focus
 
 .. code-block:: matlab
 
-    lines = plot(chains(:,:,1), color='blue');
-    lines(4) = 0.05
-
+    lines = plot(chains(:,:,1),'-b');
+    for i = 1:length(lines)
+        lines(i).Color(4) = 0.05;
+    end
+        
 .. image:: https://github.com/gboehl/emcwrap/blob/main/docs/traces.png?raw=true
   :width: 800
   :alt: MCMC traces
@@ -138,8 +141,10 @@ While DIME is a MCMC sampler, it can straightforwardly be used as a global optim
 
 .. code-block:: matlab
 
-    lines = plot(lprobs, color='blue');
-    lines(4) = 0.05
+    lines = plot(lprobs, '-b');
+    for i = 1:length(lines)
+        lines(i).Color(4) = 0.05;
+    end
 
 .. image:: https://github.com/gboehl/emcwrap/blob/main/docs/lprobs.png?raw=true
   :width: 800
