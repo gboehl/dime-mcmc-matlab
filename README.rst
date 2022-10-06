@@ -107,15 +107,15 @@ Let's plot the marginal distribution along the first dimension (remember that th
     density = counts / (sum(counts) * (bins(2) - bins(1)));
 
     % plot
+    figure;
     hold on
-    bar(bins+(bins(2) - bins(1))/2, density)
+    bar(bins + (bins(2)-bins(1))/2, density)
     plot(x, mpdf)
     plot(x, normpdf(x, 0, sqrt(initvar)))
-    plot(x, tpdf((x - prop_mean(1))/sqrt(prop_cov(1,1)*10/8), 10))
+    plot(x, tpdf((x - prop_mean(1))/scale, 10)/scale)
     xlim([-4 4])
     legend({'Sample', 'Target','Initialization','Final Proposal'},'Location','northwest')
     hold off
-
 
 .. image:: https://github.com/gboehl/emcwrap/blob/main/docs/dist.png?raw=true
   :width: 800
@@ -126,6 +126,7 @@ To ensure proper mixing, let us also have a look at the MCMC traces, again focus
 
 .. code-block:: matlab
 
+    figure;
     lines = plot(chains(:,:,1),'-b');
     for i = 1:length(lines)
         lines(i).Color(4) = 0.05;
@@ -141,6 +142,7 @@ While DIME is a MCMC sampler, it can straightforwardly be used as a global optim
 
 .. code-block:: matlab
 
+    figure;
     lines = plot(lprobs, '-b');
     for i = 1:length(lines)
         lines(i).Color(4) = 0.05;
