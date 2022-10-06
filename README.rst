@@ -99,7 +99,7 @@ Let's plot the marginal distribution along the first dimension (remember that th
     % get sample and analytical marginal pdf
     x = linspace(-4,4,1000);
     mpdf = dime_test_func_marginal_pdf(x, cov_scale, m, weight);
-    sample = reshape(chains(end-fix(niter/3):end,:,1), [], 1);
+    sample = reshape(chains(end-fix(niter/2):end,:,1), [], 1);
 
     % calculate a histogram with densities
     bins = linspace(-4,4,100);
