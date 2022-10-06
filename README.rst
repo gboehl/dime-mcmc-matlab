@@ -23,7 +23,7 @@ Copy the `matlab <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_
 
 You can get a zip file containing the complete repo `here <https://github.com/gboehl/dime-mcmc-matlab/archive/refs/heads/main.zip>`_.
 
-Note that you need the statistics toolbox for matlab. Note that this seems to be not fully compatible with ``pkg load statistics`` in Octave (sorry, not my fault).
+Note that you need the statistics toolbox for matlab. Unfortunately this toolbox does not seem to be fully compatible with ``pkg load statistics`` in Octave (sorry, not my fault).
 
 There exist complementary implementations of DIME MCMC in `Python <https://github.com/gboehl/emcwrap>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_ (where you don't need expensive toolboxes).
 
