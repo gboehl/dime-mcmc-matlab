@@ -3,14 +3,14 @@ dime-mcmc-matlab
 
 **Differential-Independence Mixture Ensemble ("DIME") MCMC sampling for matlab**
 
-This is a standalone matlab implementation of the DIME sampler (previously ADEMC sampler) proposed in `Ensemble MCMC Sampling for DSGE Models <https://gregorboehl.com/live/ademc_boehl.pdf>`_. *(Gregor Boehl, 2022, CRC 224 discussion paper series)*.
+This is a standalone matlab implementation of the DIME sampler proposed in `Ensemble MCMC Sampling for Robust Bayesian Inference <https://gregorboehl.com/live/ademc_boehl.pdf>`_. *(Gregor Boehl, 2022, SSRN No. 4250395)*.
 
 The sampler has a series of advantages over conventional samplers:
 
-#. DIME MCMC is a (very fast) **global multi-start optimizer** and, at the same time, a **MCMC sampler** that converges to the posterior distribution. This makes any posterior mode density maximization prior to MCMC sampling superfluous.
+#. DIME MCMC is a (very fast) gradient-free **global multi-start optimizer** and, at the same time, a **MCMC sampler** that converges to the posterior distribution. This makes any posterior mode density maximization prior to MCMC sampling superfluous.
 #. The DIME sampler is pretty robust for odd shaped, **multimodal distributions**.
 #. DIME MCMC is **parallelizable**: many chains can run in parallel, and the necessary number of draws decreases almost one-to-one with the number of chains.
-#. DIME proposals are generated from an **endogenous and adaptive proposal distribution**, thereby providing close-to-optimal proposal distributions without the need for manual fine-tuning.
+#. DIME proposals are generated from an **endogenous and adaptive proposal distribution**, thereby providing close-to-optimal proposal distributions for black box target distributions without the need for manual fine-tuning.
 
 There is a nice `set of slides <https://gregorboehl.com/revealjs/emc>`_ on my website which explains the DIME principle.
 
@@ -160,11 +160,11 @@ References
 
 If you are using this software in your research, please cite
 
-.. code-block::
+.. code-block:: bibtex
 
     @techreport{boehl2022mcmc,
-    title         = {Ensemble MCMC Sampling for DSGE Models},
-    author        = {Boehl, Gregor},
-    year          = 2022,
-    institution   = {CRC224 discussion paper series}
+    author={Gregor Boehl},
+    title={Ensemble MCMC Sampling for Robust Bayesian Inference},
+    journal={Available at SSRN 4250395},
+    year={2022}
     }
