@@ -1,4 +1,4 @@
-function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist)
+function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist, optrho)
 % function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist)
 % DIME MCMC sampling
 %
@@ -10,6 +10,7 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 %   o gamma             [float]     The mean stretch factor for the proposal vector. By default, it is 2.38 / sqrt(2 ndim) as recommended by ter Braak (2006): http://www.stat.columbia.edu/~gelman/stuff_for_blog/cajo.pdf
 %   o aimh_prob         [float]     Probability to draw an adaptive independence Metropolis Hastings (AIMH) proposal. By default this is set to 0.1.
 %   o df_proposal_dist  [float]     Degrees of freedom of the multivariate t distribution used for AIMH proposals. Defaults to 10.
+%   o rho               [float]     The decay parameter for mean and covariance of the AIMH proposals. Defaults to 0.999.
 %
 % OUTPUTS
 %   o chains            [array]     The samples (in form of an array of chains)
@@ -18,6 +19,7 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 %   o prop_cov          [array]     The last covariance of the proposal function.
 
 [nchain, ndim] = size(init);
+isplit = fix(nchain/2);
 
 % get some default values
 if nargin > 3
@@ -44,6 +46,12 @@ else
     dft = 10;
 end
 
+if nargin > 7
+    rho = optrho;
+else
+    rho = 0.999;
+end
+
 % initialize
 prop_cov = eye(ndim);
 prop_mean = zeros(ndim,1);
@@ -62,17 +70,6 @@ pbar = waitbar(0, '');
 
 for i = 1:niter
 
-    % get differential evolution proposal
-    % draw the indices of the complementary chains
-    i1 = (0:nchain-1) + randsample(nchain-1,nchain, true)';
-    i2 = (0:nchain-1) + randsample(nchain-2,nchain, true)';
-    i2(i2 > i1) = i2(i2 > i1) + 1;
-
-    % add small noise and calculate proposal
-    f = sigma*normrnd(0,1, nchain, 1);
-    q = x + g0 * (x(mod(i1, nchain) + 1,:) - x(mod(i2, nchain) + 1,:)) + f;
-    factors = zeros(nchain,1);
-
     % log weight of current ensemble
     lweight = logsumexp(lprob) + log(sum(accepted)) - log(nchain);
 
@@ -84,29 +81,68 @@ for i = 1:niter
     newcumlweight = logsumexp([cumlweight lweight]);
     prop_cov = exp(cumlweight - newcumlweight) * prop_cov + exp(lweight - newcumlweight) * ncov;
     prop_mean = exp(cumlweight - newcumlweight) * prop_mean + exp(lweight - newcumlweight) * nmean;
-    cumlweight = newcumlweight;
+    cumlweight = newcumlweight + log(rho);
+    naccepted = 0;
 
-    % get AIMH proposal
-    xchnge = unifrnd(0,1,nchain,1) <= aimh_prob;
+    for complementary_ensemble = [false true]
 
-    % draw alternative candidates and calculate their proposal density
-    xcand = mvtrnd(prop_cov*(dft - 2)/dft, dft, sum(xchnge));
-    lprop_old = log(mvtpdf(x(xchnge,:), prop_cov*(dft - 2)/dft, dft));
-    lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft, dft));
+        % define current ensemble
+        if complementary_ensemble
+            xcur = x(1:isplit+1,:);
+            xref = x(isplit+1:end,:);
+            lprobcur = lprob(1:isplit+1);
+        else
+            xref = x(1:isplit+1,:);
+            xcur = x(isplit+1:end,:);
+            lprobcur = lprob(isplit+1:end);
+        end
+        cursize = size(xcur,1);
+        refsize = nchain - cursize + 1.;
 
-    % update proposals and factors
-    q(xchnge,:) = xcand;
-    factors(xchnge) = lprop_old - lprop_new;
+        % get differential evolution proposal
+        % draw the indices of the complementary chains
+        i1 = (0:cursize-1) + randsample(cursize-1,cursize, true)';
+        i2 = (0:cursize-1) + randsample(cursize-2,cursize, true)';
+        i2(i2 > i1) = i2(i2 > i1) + 1;
 
-    % Metropolis-Hasings 
-    newlprob = log_prob(q');
-    lnpdiff = factors + newlprob - lprob;
-    accepted = lnpdiff > log(unifrnd(0,1,nchain,1));
-    naccepted = sum(accepted);
+        % add small noise and calculate proposal
+        f = sigma*normrnd(0,1, cursize, 1);
+        q = xcur + g0 * (xref(mod(i1, refsize) + 1,:) - xref(mod(i2, refsize) + 1,:)) + f;
+        factors = zeros(cursize,1);
 
-    % update chains
-    x(accepted,:) = q(accepted,:);
-    lprob(accepted) = newlprob(accepted);
+        % get AIMH proposal
+        xchnge = unifrnd(0,1,cursize,1) <= aimh_prob;
+
+        % draw alternative candidates and calculate their proposal density
+        xcand = mvtrnd(prop_cov*(dft - 2)/dft, dft, sum(xchnge));
+        lprop_old = log(mvtpdf(xcur(xchnge,:), prop_cov*(dft - 2)/dft, dft));
+        lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft, dft));
+
+        % update proposals and factors
+        q(xchnge,:) = xcand;
+        factors(xchnge) = lprop_old - lprop_new;
+
+        % Metropolis-Hasings 
+        newlprob = log_prob(q');
+        lnpdiff = factors + newlprob - lprobcur;
+        accepted = lnpdiff > log(unifrnd(0,1,cursize,1));
+        naccepted = naccepted + sum(accepted);
+
+        % update chains
+        xcur(accepted,:) = q(accepted,:);
+        lprobcur(accepted) = newlprob(accepted);
+
+        % must be done because matlab does not know pointers
+        if complementary_ensemble
+            x(1:isplit+1,:) = xcur;
+            x(isplit+1:end,:) = xref;
+            lprob(1:isplit+1) = lprobcur;
+        else
+            x(1:isplit+1,:) = xref;
+            x(isplit+1:end,:) = xcur;
+            lprob(isplit+1:end) = lprobcur;
+        end
+    end
 
     % store
     chains(i,:,:) = x;
