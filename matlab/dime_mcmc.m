@@ -123,7 +123,7 @@ for i = 1:niter
         factors(xchnge) = lprop_old - lprop_new;
 
         % Metropolis-Hasings 
-        newlprob = log_prob(q');
+        newlprob = log_prob(q')
         lnpdiff = factors + newlprob - lprobcur;
         accepted = lnpdiff > log(unifrnd(0,1,cursize,1));
         naccepted = naccepted + sum(accepted);
@@ -148,6 +148,6 @@ for i = 1:niter
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
 
-    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%.0d%%]", max(lprob), std(lprob), 100*naccepted/nchain));
+    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%.0f%%]", max(lprob), std(lprob), 100*naccepted/nchain));
 end
 close(pbar)
