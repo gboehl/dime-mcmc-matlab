@@ -56,7 +56,7 @@ end
 prop_cov = eye(ndim);
 prop_mean = zeros(ndim,1);
 fixPSD = eye(size(prop_cov,1))*1e-15;
-accepted = ones(nchain,1);
+naccepted = 1;
 cumlweight = -inf;
 
 % calculate intial values
@@ -72,7 +72,7 @@ pbar = waitbar(0, '');
 for i = 1:niter
 
     % log weight of current ensemble
-    lweight = logsumexp(lprob) + log(sum(accepted)) - log(nchain);
+    lweight = logsumexp(lprob) + log(naccepted) - log(nchain);
 
     % calculate stats for current ensemble
     ncov = cov(x);
@@ -89,15 +89,13 @@ for i = 1:niter
 
         % define current ensemble
         if complementary_ensemble
-            xcur = x(1:isplit+1,:);
-            xref = x(isplit+1:end,:);
-            lprobcur = lprob(1:isplit+1);
+            idcur = 1:isplit+1;
+            idref = isplit+1:nchain;
         else
-            xref = x(1:isplit+1,:);
-            xcur = x(isplit+1:end,:);
-            lprobcur = lprob(isplit+1:end);
+            idcur = isplit+1:nchain;
+            idref = 1:isplit+1;
         end
-        cursize = size(xcur,1);
+        cursize = length(idcur);
         refsize = nchain - cursize + 1.;
 
         % get differential evolution proposal
@@ -108,7 +106,7 @@ for i = 1:niter
 
         % add small noise and calculate proposal
         f = sigma*normrnd(0,1, cursize, 1);
-        q = xcur + g0 * (xref(mod(i1, refsize) + 1,:) - xref(mod(i2, refsize) + 1,:)) + f;
+        q = x(idcur,:) + g0 * (x(idref(mod(i1, refsize) + 1),:) - x(idref(mod(i2, refsize) + 1),:)) + f;
         factors = zeros(cursize,1);
 
         % get AIMH proposal
@@ -116,7 +114,7 @@ for i = 1:niter
 
         % draw alternative candidates and calculate their proposal density
         xcand = mvtrnd(prop_cov*(dft - 2)/dft + fixPSD, dft, sum(xchnge));
-        lprop_old = log(mvtpdf(xcur(xchnge,:), prop_cov*(dft - 2)/dft + fixPSD, dft));
+        lprop_old = log(mvtpdf(x(idcur(xchnge),:), prop_cov*(dft - 2)/dft + fixPSD, dft));
         lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft + fixPSD, dft));
 
         % update proposals and factors
@@ -125,30 +123,19 @@ for i = 1:niter
 
         % Metropolis-Hasings 
         newlprob = log_prob(q');
-        lnpdiff = factors + newlprob - lprobcur;
+        lnpdiff = factors + newlprob - lprob(idcur);
         accepted = lnpdiff > log(unifrnd(0,1,cursize,1));
         naccepted = naccepted + sum(accepted);
 
         % update chains
-        xcur(accepted,:) = q(accepted,:);
-        lprobcur(accepted) = newlprob(accepted);
-
-        % must be done because matlab does not know pointers
-        if complementary_ensemble
-            x(1:isplit+1,:) = xcur;
-            x(isplit+1:end,:) = xref;
-            lprob(1:isplit+1) = lprobcur;
-        else
-            x(1:isplit+1,:) = xref;
-            x(isplit+1:end,:) = xcur;
-            lprob(isplit+1:end) = lprobcur;
-        end
+        x(idcur(accepted),:) = q(accepted,:);
+        lprob(idcur(accepted)) = newlprob(accepted);
     end
 
     % store
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
 
-    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%.0d%%]", max(lprob), std(lprob), 100*naccepted/nchain));
+    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%02.f%%]", max(lprob), std(lprob), 100*naccepted/nchain));
 end
 close(pbar)
