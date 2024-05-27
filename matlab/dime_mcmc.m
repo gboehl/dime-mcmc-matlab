@@ -136,6 +136,6 @@ for i = 1:niter
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
 
-    waitbar(i/niter, pbar, sprintf("[ll/MAF: %.3f(%1.0e)/%02.f%%]", max(lprob), std(lprob), 100*naccepted/nchain));
+    waitbar(i/niter, pbar, sprintf("%d [ll(std)/MAF: %.3f(%1.0e)/%02.0f%%]", i, max(lprob), std(lprob), 100*naccepted/nchain));
 end
 close(pbar)
