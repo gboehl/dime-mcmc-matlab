@@ -55,6 +55,7 @@ end
 % initialize
 prop_cov = eye(ndim);
 prop_mean = zeros(ndim,1);
+fixPSD = eye(size(prop_cov,1))*1e-15;
 accepted = ones(nchain,1);
 cumlweight = -inf;
 
@@ -114,9 +115,9 @@ for i = 1:niter
         xchnge = unifrnd(0,1,cursize,1) <= aimh_prob;
 
         % draw alternative candidates and calculate their proposal density
-        xcand = mvtrnd(prop_cov*(dft - 2)/dft, dft, sum(xchnge));
-        lprop_old = log(mvtpdf(xcur(xchnge,:), prop_cov*(dft - 2)/dft, dft));
-        lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft, dft));
+        xcand = mvtrnd(prop_cov*(dft - 2)/dft + fixPSD, dft, sum(xchnge));
+        lprop_old = log(mvtpdf(xcur(xchnge,:), prop_cov*(dft - 2)/dft + fixPSD, dft));
+        lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft + fixPSD, dft));
 
         % update proposals and factors
         q(xchnge,:) = xcand;
