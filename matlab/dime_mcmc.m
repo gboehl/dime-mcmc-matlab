@@ -54,7 +54,7 @@ end
 
 % initialize
 prop_cov = eye(ndim);
-prop_mean = zeros(ndim,1);
+prop_mean = zeros(1,ndim);
 fixPSD = eye(size(prop_cov,1))*1e-15;
 naccepted = 1;
 cumlweight = -inf;
