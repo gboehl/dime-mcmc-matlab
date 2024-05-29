@@ -113,9 +113,9 @@ for i = 1:niter
         xchnge = unifrnd(0,1,cursize,1) <= aimh_prob;
 
         % draw alternative candidates and calculate their proposal density
-        xcand = mvtrnd(prop_cov*(dft - 2)/dft + fixPSD, dft, sum(xchnge));
-        lprop_old = log(mvtpdf(x(idcur(xchnge),:), prop_cov*(dft - 2)/dft + fixPSD, dft));
-        lprop_new = log(mvtpdf(xcand, prop_cov*(dft - 2)/dft + fixPSD, dft));
+        xcand = mvtrnd(prop_cov*(dft - 2)/dft + fixPSD, dft, sum(xchnge)) + prop_mean;
+        lprop_old = log(mvtpdf(x(idcur(xchnge),:)-prop_mean, prop_cov*(dft - 2)/dft + fixPSD, dft));
+        lprop_new = log(mvtpdf(xcand-prop_mean, prop_cov*(dft - 2)/dft + fixPSD, dft));
 
         % update proposals and factors
         q(xchnge,:) = xcand;
