@@ -92,7 +92,7 @@ Now let the sampler run for 5000 iterations.
     niter = 5000;
     [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, initchain, niter);
 
-The setting of ``aimh_prob`` is the actual default value. For less complex distributions (e.g. distributions closer to Gaussian) a higher value can be chosen, which accelerates burn-in. The information in the progress bar has the structure ``[ll/MAF: <maximum log-prob>(<standard deviation of log-prob>)/<mean acceptance fraction>]``.
+A struct with options can be appended as additional argument, which are documented in the function help. The setting of ``opt.aimh_prob`` is the actual default value. For less complex distributions (e.g. distributions closer to Gaussian) a higher value can be chosen, which accelerates burn-in. The information in the progress bar has the structure ``[ll/MAF: <maximum log-prob>(<standard deviation of log-prob>)/<mean acceptance fraction>]``.
 
 Let's plot the marginal distribution along the first dimension (remember that this actually is a 35-dimensional distribution).
 

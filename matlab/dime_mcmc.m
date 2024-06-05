@@ -1,16 +1,18 @@
-function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist, optrho)
-% function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, optaimh_prob, optsigma, optgamma, optdf_proposal_dist)
+function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, opts)
+% function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter, opts)
 % DIME MCMC sampling
 %
 % INPUTS
 %   o log_prob          [function]  (vectorized) function returning the log-density
 %   o init              [array]     The initial ensemble
 %   o niter             [int]       The number of iterations to be run.
-%   o sigma             [float]     The standard deviation of the Gaussian used to stretch the proposal vector.
-%   o gamma             [float]     The mean stretch factor for the proposal vector. By default, it is 2.38 / sqrt(2 ndim) as recommended by ter Braak (2006): http://www.stat.columbia.edu/~gelman/stuff_for_blog/cajo.pdf
-%   o aimh_prob         [float]     Probability to draw an adaptive independence Metropolis Hastings (AIMH) proposal. By default this is set to 0.1.
-%   o df_proposal_dist  [float]     Degrees of freedom of the multivariate t distribution used for AIMH proposals. Defaults to 10.
-%   o rho               [float]     The decay parameter for mean and covariance of the AIMH proposals. Defaults to 0.999.
+%   o opts              [struct]    Struct with tuning options:
+%       - opts.aimh_prob         [float]     Probability to draw an adaptive independence Metropolis Hastings (AIMH) proposal. By default this is set to 0.1.
+%       - opts.sigma             [float]     The standard deviation of the Gaussian used to stretch the proposal vector.
+%       - opts.gamma             [float]     The mean stretch factor for the proposal vector. By default, it is 2.38 / sqrt(2 ndim) as recommended by ter Braak (2006): http://www.stat.columbia.edu/~gelman/stuff_for_blog/cajo.pdf
+%       - opts.df_proposal_dist  [float]     Degrees of freedom of the multivariate t distribution used for AIMH proposals. Defaults to 10.
+%       - opts.rho               [float]     The decay parameter for mean and covariance of the AIMH proposals. Defaults to 0.999.
+%       - opts.show_pbar         [bool]      Whether to show a waitbar. Defaults to true.
 %
 % OUTPUTS
 %   o chains            [array]     The samples (in form of an array of chains)
@@ -22,34 +24,44 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 isplit = fix(nchain/2);
 
 % get some default values
-if nargin > 3
-    aimh_prob = optaimh_prob;
+if nargin == 3
+    opts.empty = true;
+end
+
+if isfield(opts,'aimh_prob')
+    aimh_prob = opts.aimh_prob;
 else
     aimh_prob = 0.1;
 end
 
-if nargin > 4
-    sigma = optsigma;
+if isfield(opts,'sigma')
+    sigma = opts.sigma;
 else
     sigma = 1e-5;
 end
 
-if nargin > 5
-    g0 = optgamma;
+if isfield(opts,'gamma')
+    g0 = opts.gamma;
 else
     g0 = 2.38 / sqrt(2 * ndim);
 end
 
-if nargin > 6
-    dft = optdf_proposal_dist;
+if isfield(opts,'df_proposal_dist')
+    dft = opts.df_proposal_dist;
 else
     dft = 10;
 end
 
-if nargin > 7
-    rho = optrho;
+if isfield(opts,'rho')
+    rho = opts.rho;
 else
     rho = 0.999;
+end
+
+if isfield(opts,'show_pbar')
+    show_pbar = opts.show_pbar;
+else
+    show_pbar = true;
 end
 
 % initialize
@@ -67,7 +79,9 @@ lprob = log_prob(x');
 chains = zeros(niter, nchain, ndim);
 lprobs = zeros(niter, nchain);
 
-pbar = waitbar(0, '');
+if show_pbar
+    pbar = waitbar(0, '');
+end
 
 for i = 1:niter
 
@@ -136,6 +150,10 @@ for i = 1:niter
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
 
-    waitbar(i/niter, pbar, sprintf("%d [ll(std)/MAF: %.3f(%1.0e)/%02.0f%%]", i, max(lprob), std(lprob), 100*naccepted/nchain));
+    if show_pbar
+        waitbar(i/niter, pbar, sprintf("%d [ll(std)/MAF: %.3f(%1.0e)/%02.0f%%]", i, max(lprob), std(lprob), 100*naccepted/nchain));
+    end
 end
-close(pbar)
+if show_pbar
+    close(pbar)
+end
