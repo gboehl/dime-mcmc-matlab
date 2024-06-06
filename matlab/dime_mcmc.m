@@ -85,20 +85,6 @@ end
 
 for i = 1:niter
 
-    % log weight of current ensemble
-    lweight = logsumexp(lprob) + log(naccepted) - log(nchain);
-
-    % calculate stats for current ensemble
-    ncov = cov(x);
-    nmean = mean(x);
-
-    % update AIMH proposal distribution
-    newcumlweight = logsumexp([cumlweight lweight]);
-    prop_cov = exp(cumlweight - newcumlweight) * prop_cov + exp(lweight - newcumlweight) * ncov;
-    prop_mean = exp(cumlweight - newcumlweight) * prop_mean + exp(lweight - newcumlweight) * nmean;
-    cumlweight = newcumlweight + log(rho);
-    naccepted = 0;
-
     for complementary_ensemble = [false true]
 
         % define current ensemble
@@ -149,6 +135,20 @@ for i = 1:niter
     % store
     chains(i,:,:) = x;
     lprobs(i,:) = lprob;
+
+    % log weight of current ensemble
+    lweight = logsumexp(lprob) + log(naccepted) - log(nchain);
+
+    % calculate stats for current ensemble
+    ncov = cov(x);
+    nmean = mean(x);
+
+    % update AIMH proposal distribution
+    newcumlweight = logsumexp([cumlweight lweight]);
+    prop_cov = exp(cumlweight - newcumlweight) * prop_cov + exp(lweight - newcumlweight) * ncov;
+    prop_mean = exp(cumlweight - newcumlweight) * prop_mean + exp(lweight - newcumlweight) * nmean;
+    cumlweight = newcumlweight + log(rho);
+    naccepted = 0;
 
     if show_pbar
         waitbar(i/niter, pbar, sprintf("%d [ll(std)/MAF: %.3f(%1.0e)/%02.0f%%]", i, max(lprob), std(lprob), 100*naccepted/nchain));
