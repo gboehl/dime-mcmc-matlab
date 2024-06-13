@@ -21,7 +21,7 @@ function [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, init, niter
 %   o prop_cov          [array]     The last covariance of the proposal function.
 
 [nchain, ndim] = size(init);
-isplit = fix(nchain/2);
+isplit = fix(nchain/2) + 1;
 
 % get some default values
 if nargin == 3
@@ -89,14 +89,14 @@ for i = 1:niter
 
         % define current ensemble
         if complementary_ensemble
-            idcur = 1:isplit+1;
-            idref = isplit+1:nchain;
+            idcur = 1:isplit;
+            idref = (isplit+1):nchain;
         else
-            idcur = isplit+1:nchain;
-            idref = 1:isplit+1;
+            idcur = (isplit+1):nchain;
+            idref = 1:isplit;
         end
         cursize = length(idcur);
-        refsize = nchain - cursize + 1.;
+        refsize = nchain - cursize;
 
         % get differential evolution proposal
         % draw the indices of the complementary chains
