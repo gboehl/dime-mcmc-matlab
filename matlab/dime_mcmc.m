@@ -102,7 +102,7 @@ for i = 1:niter
         % draw the indices of the complementary chains
         i1 = (0:cursize-1) + randsample(cursize-1,cursize, true)';
         i2 = (0:cursize-1) + randsample(cursize-2,cursize, true)';
-        i2(i2 > i1) = i2(i2 > i1) + 1;
+        i2(i2 >= i1) = i2(i2 >= i1) + 1;
 
         % add small noise and calculate proposal
         f = sigma*normrnd(0,1, cursize, 1);
