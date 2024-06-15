@@ -74,6 +74,9 @@ cumlweight = -inf;
 % calculate intial values
 x = init;
 lprob = log_prob(x');
+if any(lprob < -1e6) 
+    error("Density of at least one member of the initial ensemble is below -1e6")
+end
 
 % preallocate
 chains = zeros(niter, nchain, ndim);
