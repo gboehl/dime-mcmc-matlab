@@ -79,7 +79,7 @@ lprob = log_prob(x');
 chains = zeros(niter, nchain, ndim);
 lprobs = zeros(niter, nchain);
 
-if show_pbar
+if show_pbar == 1
     pbar = waitbar(0, '');
 end
 
@@ -149,11 +149,13 @@ for i = 1:niter
     prop_mean = exp(cumlweight - newcumlweight) * prop_mean + exp(lweight - newcumlweight) * nmean;
     cumlweight = newcumlweight + log(rho);
 
-    if show_pbar
+    if show_pbar == 1
         waitbar(i/niter, pbar, sprintf("%d [ll(std)/MAF: %.3f(%1.0e)/%02.0f%%]", i, max(lprob), std(lprob), 100*naccepted/nchain));
+    elseif show_pbar > 1
+        fprintf("%d/%d [ll(std)/MAF: %.3f(%1.0e)] %02.0f%%\n", i, niter, max(lprob), std(lprob), 100*naccepted/nchain);
     end
     naccepted = 0;
 end
-if show_pbar
+if show_pbar == 1
     close(pbar)
 end
