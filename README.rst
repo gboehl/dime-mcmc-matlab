@@ -49,6 +49,8 @@ The core functionality is included in the function ``dime_mcmc``:
     [chains, lprobs, prop_mean, prop_cov] = dime_mcmc(log_prob, initchain, niter)
     ...
 
+When using bounded priors it is recommended to use parameter transformations to maintain high acceptance rates.
+
 
 Tutorial
 --------
