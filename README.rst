@@ -81,7 +81,13 @@ Next, define the initial ensemble. In a Bayesian setup, a good initial ensemble 
     nchain = ndim*5; % a sane default
     initcov = eye(ndim)*initvar;
     initmean = zeros(ndim, 1);
-    initchain = mvnrnd(initmean, initcov, nchain);
+
+Find `nchain` draws that have a finite likelihood:
+
+.. code-block:: matlab
+    initchain = mvnrnd(initmean, initcov, 2*nchain);
+    initchain = initchain(log_prob(initchain') > -1e6,:);
+    initchain = initchain(1:nchain,:);
 
 Setting the number of parallel chains to ``5*ndim`` is a sane default. For highly irregular distributions with several modes you should use more chains. Very simple distributions can go with less. 
 
