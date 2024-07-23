@@ -3,7 +3,7 @@ dime-mcmc-matlab
 
 **Differential-Independence Mixture Ensemble ("DIME") MCMC sampling for matlab**
 
-This is a standalone matlab implementation of the DIME sampler proposed in `Ensemble MCMC Sampling for Robust Bayesian Inference <https://gregorboehl.com/live/ademc_boehl.pdf>`_. *(Gregor Boehl, 2022, SSRN No. 4250395)*.
+This is a standalone matlab implementation of the DIME sampler proposed in `DIME MCMC: A Swiss Army Knife for Bayesian Inference <https://gregorboehl.com/live/dime_mcmc_boehl.pdf>`_ *(Gregor Boehl, 2022, SSRN No. 4250395)*.
 
 The sampler has a series of advantages over conventional samplers:
 
