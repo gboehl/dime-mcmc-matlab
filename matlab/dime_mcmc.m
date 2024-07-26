@@ -103,17 +103,17 @@ for i = 1:niter
 
         % get differential evolution proposal
         % draw the indices of the complementary chains
-        i1 = (0:cursize-1) + randsample(cursize-1,cursize, true)';
-        i2 = (0:cursize-1) + randsample(cursize-2,cursize, true)';
+        i1 = (0:cursize-1) + randi([1 cursize-1], 1, cursize);
+        i2 = (0:cursize-1) + randi([1 cursize-2], 1, cursize);
         i2(i2 >= i1) = i2(i2 >= i1) + 1;
 
         % add small noise and calculate proposal
-        f = sigma*normrnd(0,1, cursize, 1);
+        f = sigma*randn(cursize, 1);
         q = x(idcur,:) + g0 * (x(idref(mod(i1, refsize) + 1),:) - x(idref(mod(i2, refsize) + 1),:)) + f;
         factors = zeros(cursize,1);
 
         % get AIMH proposal
-        xchnge = unifrnd(0,1,cursize,1) <= aimh_prob;
+        xchnge = rand(cursize,1) <= aimh_prob;
 
         % draw alternative candidates and calculate their proposal density
         xcand = mvt_rnd(prop_mean, prop_cov*(dft - 2)/dft + fixPSD, dft, sum(xchnge));
@@ -127,7 +127,7 @@ for i = 1:niter
         % Metropolis-Hasings 
         newlprob = log_prob(q');
         lnpdiff = factors + newlprob - lprob(idcur);
-        accepted = lnpdiff > log(unifrnd(0,1,cursize,1));
+        accepted = lnpdiff > log(rand(cursize,1));
         naccepted = naccepted + sum(accepted);
 
         % update chains
