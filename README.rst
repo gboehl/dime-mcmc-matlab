@@ -5,6 +5,8 @@ dime-mcmc-matlab
 
 This is a standalone matlab implementation of the DIME sampler proposed in `DIME MCMC: A Swiss Army Knife for Bayesian Inference <https://gregorboehl.com/live/dime_mcmc_boehl.pdf>`_ *(Gregor Boehl, 2022, SSRN No. 4250395)*.
 
+There exist complementary implementations of DIME MCMC in `Python <https://github.com/gboehl/dime_sampler>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_ (where you don't need expensive toolboxes). DIME is also part of `Dynare 7.0 <https://www.dynare.org/manual/the-model-file.html#posterior-sampling-options>`_ (sampler option ``dime_mcmc``). 
+
 The sampler has a series of advantages over conventional samplers:
 
 #. DIME MCMC is a (very fast) gradient-free **global multi-start optimizer** and, at the same time, a **MCMC sampler** that converges to the posterior distribution. This makes any posterior mode density maximization prior to MCMC sampling superfluous.
@@ -14,8 +16,8 @@ The sampler has a series of advantages over conventional samplers:
 
 There is a nice `set of slides <https://gregorboehl.com/revealjs/emc>`_ on my website which explains the DIME principle.
 
-Installation
-------------
+Installation and Kudos
+----------------------
 
 Copy the `matlab <https://github.com/gboehl/dime-mcmc-matlab/tree/main/matlab>`_ folder from this repo somwhere on your PC and add it to your matlab path:
 
@@ -27,7 +29,16 @@ You can get a zip file containing the complete repo `here <https://github.com/gb
 
 Note that you need the statistics toolbox for matlab. Unfortunately this toolbox does not seem to be fully compatible with ``pkg load statistics`` in Octave (sorry, not my fault. But maybe you can steal the respective files `from octave <https://github.com/gnu-octave/statistics>`_.)
 
-There exist complementary implementations of DIME MCMC in `Python <https://github.com/gboehl/emcwrap>`_ and `Julia <https://github.com/gboehl/DIMESampler.jl>`_ (where you don't need expensive toolboxes).
+If you are using this software in your research, please cite
+
+.. code-block:: bibtex
+
+    @techreport{boehl2022mcmc,
+    author={Gregor Boehl},
+    title={DIME MCMC: A Swiss Army Knife for Bayesian Inference},
+    journal={Available at SSRN 4250395},
+    year={2022}
+    }
 
 Usage
 -----
@@ -163,16 +174,3 @@ While DIME is a MCMC sampler, it can straightforwardly be used as a global optim
   :width: 800
   :alt: Log-likelihoods
 
-References
-----------
-
-If you are using this software in your research, please cite
-
-.. code-block:: bibtex
-
-    @techreport{boehl2022mcmc,
-    author={Gregor Boehl},
-    title={Ensemble MCMC Sampling for Robust Bayesian Inference},
-    journal={Available at SSRN 4250395},
-    year={2022}
-    }
